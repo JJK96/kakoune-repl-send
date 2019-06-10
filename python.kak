@@ -24,7 +24,7 @@ python-bridge-stop %{
 define-command -docstring 'Evaluate selections using python-bridge' \
 python-bridge-send %{
     evaluate-commands %sh{
-        echo "set-register | %{ cat > $kak_opt_python_bridge_in; while IFS= read -t 0.1 response; do echo \$response; done < $kak_opt_python_bridge_out}"
+        echo "set-register | %{ cat > $kak_opt_python_bridge_in; while IFS= read -t 0.1 response; do echo -n \$response; done < $kak_opt_python_bridge_out}"
     }
     execute-keys -itersel "|<ret>"
 }
