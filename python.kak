@@ -3,7 +3,7 @@
 declare-option str python_bridge_in /tmp/python-bridge-in
 declare-option str python_bridge_out /tmp/python-bridge-out
 
-define-command start-python-bridge %{
+define-command python-bridge-start %{
     nop %sh{
         mkfifo $kak_opt_python_bridge_in
         mkfifo $kak_opt_python_bridge_out
@@ -11,7 +11,7 @@ define-command start-python-bridge %{
     }
 }
 
-define-command stop-python-bridge %{
+define-command python-bridge-stop %{
     nop %sh{
         echo "exit()" > $kak_opt_python_bridge_in
         rm $kak_opt_python_bridge_in
@@ -19,7 +19,7 @@ define-command stop-python-bridge %{
     }
 }
 
-define-command send-to-python %{
+define-command python-bridge-send %{
     evaluate-commands %sh{
         echo "set-register | %{ cat > $kak_opt_python_bridge_in; while IFS= read -t 0.1 response; do echo \$response; done < $kak_opt_python_bridge_out}"
     }
