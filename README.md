@@ -3,6 +3,6 @@ This way you can do calculations while keeping memory of previous variables, so 
 
 # commands
 
-`python-bridge-start` Start the python bridge
-`python-bridge-stop` Stop the python bridge
-`python-bridge-send` Send the current selections through the python bridge
+`python-bridge-start` Start the python bridge  
+`python-bridge-stop` Stop the python bridge  
+`python-bridge-send` Send the current selections through the python bridge  
