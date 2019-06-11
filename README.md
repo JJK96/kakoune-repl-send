@@ -5,6 +5,13 @@ This way you can do calculations while keeping memory of previous variables, so 
 
 The script assumes that `python-repl.py` is located in `%val{config}/plugins/kakoune-python-bridge`
 
+# usage
+
+Select a piece of text that can be interpreted by python, then run `python-bridge-send`.
+This will automatically start the interpreter if it is not running.
+
+The interpreter will be shut down when the kakoune server is closed.
+
 # commands
 
 `python-bridge-start` Start the python bridge  
