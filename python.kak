@@ -1,8 +1,8 @@
 # python bridge for executing things interactively
 
 declare-option -hidden str python_bridge_in 
-declare-option -hidden str python_bridge_out 
-declare-option -hidden str python_bridge_source %val{source}
+declare-option -hidden str python_bridge_out
+declare-option -hidden str python_bridge_source %sh(printf '%s' "${kak_source%/*}")
 declare-option -hidden bool python_bridge_running false
 
 define-command -docstring 'Create FIFOs and start python -i' \
@@ -10,7 +10,7 @@ python-bridge-start %{
     nop %sh{
         mkfifo $kak_opt_python_bridge_in
         mkfifo $kak_opt_python_bridge_out
-        ( python $(dirname $kak_opt_python_bridge_source)/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out) >/dev/null 2>&1 </dev/null &
+        ( python $kak_opt_python_bridge_source/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out) >/dev/null 2>&1 </dev/null &
     }
     set-option global python_bridge_running true
 }
