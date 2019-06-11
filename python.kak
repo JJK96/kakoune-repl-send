@@ -8,7 +8,7 @@ python-bridge-start %{
     nop %sh{
         mkfifo $kak_opt_python_bridge_in
         mkfifo $kak_opt_python_bridge_out
-        ( tail -f $kak_opt_python_bridge_in | python -i > $kak_opt_python_bridge_out ) >/dev/null 2>&1 </dev/null &
+        ( python $kak_config/plugins/kakoune-python-bridge/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out 2>/tmp/err) >/dev/null 2>&1 </dev/null &
     }
 }
 
@@ -24,7 +24,7 @@ python-bridge-stop %{
 define-command -docstring 'Evaluate selections using python-bridge' \
 python-bridge-send %{
     evaluate-commands %sh{
-        echo "set-register | %{ cat > $kak_opt_python_bridge_in; while IFS= read -t 0.1 response; do echo \"\$response\"; done < $kak_opt_python_bridge_out}"
+        echo "set-register | %{ input=\$(cat); cat $kak_opt_python_bridge_out & echo \"\$input\" > $kak_opt_python_bridge_in & wait}"
     }
     execute-keys -itersel "|<ret>"
 }
