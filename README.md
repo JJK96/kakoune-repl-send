@@ -1,6 +1,19 @@
 This bridge runs a python shell in the background and can send selections through the shell.
 This way you can do calculations while keeping memory of previous variables, so this enables you to use variables in later calculations.
 
+# Install
+
+Add this repository to your autoload dir: `~/.config/kak/autoload/`.
+
+Or via [plug.kak](https://github.com/andreyorst/plug.kak):
+
+```
+plug 'JJK96/kakoune-python-bridge' %{
+  # Suggested mapping
+  map global normal = ':python-bridge-send<ret>'
+}
+```
+
 # usage
 
 Select a piece of text that can be interpreted by python, then run `python-bridge-send`.
