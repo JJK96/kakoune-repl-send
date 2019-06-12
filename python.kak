@@ -5,12 +5,15 @@ declare-option -hidden str python_bridge_out
 declare-option -hidden str python_bridge_source %sh(printf '%s' "${kak_source%/*}")
 declare-option -hidden bool python_bridge_running false
 
+set global python_bridge_in /tmp/kakoune-%val{kak_session}-python-bridge-in
+set global python_bridge_out /tmp/kakoune-%val{kak_session}-python-bridge-out
+
 define-command -docstring 'Create FIFOs and start python -i' \
 python-bridge-start %{
     nop %sh{
         mkfifo $kak_opt_python_bridge_in
         mkfifo $kak_opt_python_bridge_out
-        ( python $kak_opt_python_bridge_source/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out) >/dev/null 2>&1 </dev/null &
+        ( python $kak_opt_python_bridge_source/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out 2>/tmp/err) >/dev/null 2>&1 </dev/null &
     }
     set-option global python_bridge_running true
 }
@@ -47,9 +50,4 @@ define-command python-bridge -params 1.. -shell-script-candidates %{
 
 hook global KakEnd .* %{
     python-bridge-stop
-}
-
-evaluate-commands %sh{
-    echo "set global python_bridge_in /tmp/kakoune-$kak_session-python-bridge-in"
-    echo "set global python_bridge_out /tmp/kakoune-$kak_session-python-bridge-out"
 }
