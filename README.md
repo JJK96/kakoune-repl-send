@@ -10,7 +10,7 @@ Or via [plug.kak](https://github.com/andreyorst/plug.kak):
 ```
 plug 'JJK96/kakoune-python-bridge' %{
   # Suggested mapping
-  map global normal = ':python-bridge-send<ret>'
+  map global normal = ': python-bridge-send<ret>'
 }
 ```
 
