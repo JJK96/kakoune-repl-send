@@ -1,12 +1,9 @@
 # python bridge for executing things interactively
 
-declare-option -hidden str python_bridge_in 
-declare-option -hidden str python_bridge_out
-declare-option -hidden str python_bridge_source %sh(printf '%s' "${kak_source%/*}")
+declare-option -hidden str python_bridge_in %sh{echo /tmp/kakoune-$kak_session-python-bridge-in}
+declare-option -hidden str python_bridge_out %sh{echo /tmp/kakoune-$kak_session-python-bridge-out}
+declare-option -hidden str python_bridge_source %sh{printf '%s' "${kak_source%/*}"}
 declare-option -hidden bool python_bridge_running false
-
-set global python_bridge_in /tmp/kakoune-%val{kak_session}-python-bridge-in
-set global python_bridge_out /tmp/kakoune-%val{kak_session}-python-bridge-out
 
 define-command -docstring 'Create FIFOs and start python -i' \
 python-bridge-start %{
