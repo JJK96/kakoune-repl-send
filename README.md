@@ -11,6 +11,11 @@ Or via [plug.kak](https://github.com/andreyorst/plug.kak):
 plug 'JJK96/kakoune-python-bridge' %{
   # Suggested mapping
   map global normal = ': python-bridge-send<ret>'
+  # run some python code initially
+  python-bridge-send %{
+from math import *
+  }
+  
 }
 ```
 
