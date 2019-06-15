@@ -1,16 +1,18 @@
 # python bridge for executing things interactively
 
-declare-option -hidden str python_bridge_in %sh{echo /tmp/kakoune-$kak_session-python-bridge-in}
-declare-option -hidden str python_bridge_out %sh{echo /tmp/kakoune-$kak_session-python-bridge-out}
+declare-option -hidden str python_bridge_folder %sh{echo /tmp/kakoune_python_bridge/$kak_session}
+declare-option -hidden str python_bridge_in %sh{echo $kak_opt_python_bridge_folder/in}
+declare-option -hidden str python_bridge_out %sh{echo $kak_opt_python_bridge_folder/out}
 declare-option -hidden str python_bridge_source %sh{printf '%s' "${kak_source%/*}"}
 declare-option -hidden bool python_bridge_running false
 
 define-command -docstring 'Create FIFOs and start python -i' \
 python-bridge-start %{
     nop %sh{
+        mkdir -p $kak_opt_python_bridge_folder
         mkfifo $kak_opt_python_bridge_in
         mkfifo $kak_opt_python_bridge_out
-        ( python $kak_opt_python_bridge_source/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out 2>/tmp/err) >/dev/null 2>&1 </dev/null &
+        ( python $kak_opt_python_bridge_source/python-repl.py $kak_opt_python_bridge_in $kak_opt_python_bridge_out) >/dev/null 2>&1 </dev/null &
     }
     set-option global python_bridge_running true
 }
@@ -23,6 +25,7 @@ python-bridge-stop %{
             echo "exit()" > $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_out
+            rmdir -p $kak_opt_python_bridge_folder
         fi
     }
     set-option global python_bridge_running false
