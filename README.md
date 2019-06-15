@@ -32,10 +32,21 @@ Then it will execute the code using python and return the output in place of the
 
 The interpreter will first try to run the code interactively line by line, if that fails, the whole code will be executed at once.
 
-The interpreter will be shut down when the kakoune server is closed.
+If `python_bridge_fifo_enabled` is set to true the output will also be written to a second fifo, for example to keep track of previous outputs. 
+
+```
+set global option python_bridge_fifo_enabled true
+```
+
+The python interpreter will be shut down when the kakoune server is closed.
 
 # commands
 
 `python-bridge-start` Start the python bridge  
 `python-bridge-stop` Stop the python bridge  
 `python-bridge-send` Send the current selections through the python bridge  
+
+# options
+
+`python_bridge_folder` The folder where the python bridge should be stored (`/tmp/kakoune_python_bridge`)  
+`python_bridge_fifo_enabled` Whether the output should be written to a second fifo (for keeping track of previous outputs)  

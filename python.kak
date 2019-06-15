@@ -3,8 +3,23 @@
 declare-option -hidden str python_bridge_folder %sh{echo /tmp/kakoune_python_bridge/$kak_session}
 declare-option -hidden str python_bridge_in %sh{echo $kak_opt_python_bridge_folder/in}
 declare-option -hidden str python_bridge_out %sh{echo $kak_opt_python_bridge_folder/out}
+declare-option -hidden str python_bridge_fifo %sh{echo $kak_opt_python_bridge_folder/fifo}
 declare-option -hidden str python_bridge_source %sh{printf '%s' "${kak_source%/*}"}
+declare-option bool python_bridge_fifo_enabled false
 declare-option -hidden bool python_bridge_running false
+
+hook global GlobalSetOption python_bridge_fifo_enabled=true %{
+    nop %sh{
+        mkfifo $kak_opt_python_bridge_fifo
+    }
+    terminal tail -f %opt{python_bridge_fifo}
+}
+
+hook global GlobalSetOption python_bridge_fifo_enabled=false %{
+    nop %sh{
+        rm $kak_opt_python_bridge_fifo
+    }
+}
 
 define-command -docstring 'Create FIFOs and start python -i' \
 python-bridge-start %{
@@ -27,6 +42,9 @@ python-bridge-stop %{
             echo "exit()" > $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_out
+            if $kak_opt_python_bridge_fifo_enabled; then
+                rm $kak_opt_python_bridge_fifo
+            fi
             rmdir -p $kak_opt_python_bridge_folder
         fi
     }
@@ -37,12 +55,17 @@ define-command -docstring 'Evaluate selections or argument using python-bridge' 
 python-bridge-send -params 0..1 %{
     python-bridge-start
     evaluate-commands %sh{
+        cat_command="cat $kak_opt_python_bridge_out"
+        if $kak_opt_python_bridge_fifo_enabled; then
+            cat_command="$cat_command | tee -a $kak_opt_python_bridge_fifo"
+        fi
+
         if [ $# -gt 0 ]; then
-            input=$(cat $kak_opt_python_bridge_out) && echo "info %{$input}" &
+            input=$(eval $cat_command) && echo "info %{$input}" &
             echo "$1" > $kak_opt_python_bridge_in &
             wait
         else
-            echo "set-register | %{ input=\$(cat); cat $kak_opt_python_bridge_out & echo \"\$input\" > $kak_opt_python_bridge_in & wait}"
+            echo "set-register | %{ input=\$(cat); eval $cat_command & echo \"\$input\" > $kak_opt_python_bridge_in & wait}"
             echo 'execute-keys -itersel "|<ret>"'
         fi
     }
