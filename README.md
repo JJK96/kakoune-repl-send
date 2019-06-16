@@ -48,5 +48,4 @@ The python interpreter will be shut down when the kakoune server is closed.
 
 # options
 
-`python_bridge_folder` The folder where the python bridge should be stored (`/tmp/kakoune_python_bridge`)  
 `python_bridge_fifo_enabled` Whether the output should be written to a second fifo (for keeping track of previous outputs)  
