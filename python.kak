@@ -42,12 +42,10 @@ python-bridge-stop %{
             echo "exit()" > $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_in
             rm $kak_opt_python_bridge_out
-            if $kak_opt_python_bridge_fifo_enabled; then
-                rm $kak_opt_python_bridge_fifo
-            fi
             rmdir -p $kak_opt_python_bridge_folder
         fi
     }
+    set-option global python_bridge_fifo_enabled false
     set-option global python_bridge_running false
 }
 

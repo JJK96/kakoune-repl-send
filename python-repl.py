@@ -13,7 +13,9 @@ while True:
             kakoune_python_bridge_failure = False
             for kakoune_python_bridge_line in kakoune_python_bridge_lines:
                 try:
-                    print(eval(kakoune_python_bridge_line))
+                    kakoun_python_bridge_output = eval(kakoune_python_bridge_line)
+                    if kakoun_python_bridge_output is not None:
+                        print(kakoun_python_bridge_output)
                 except Exception:
                     exec(kakoune_python_bridge_line)
         except Exception:
