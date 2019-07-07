@@ -65,7 +65,7 @@ python-bridge-send -params 0..1 %{
         fi
         out=""
         while [ $# -gt 0 ]; do
-            output=$(eval $cat_command) && echo "set-option -add global python_bridge_output $output" &
+            output=$(eval $cat_command) && echo "set-option -add global python_bridge_output %{$output}" &
             echo "$1" > $kak_opt_python_bridge_in &
             wait
             shift
