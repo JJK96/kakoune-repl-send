@@ -10,7 +10,7 @@ Or via [plug.kak](https://github.com/andreyorst/plug.kak):
 ```
 plug 'JJK96/kakoune-python-bridge' %{
   # Suggested mapping
-  map global normal = ': python-bridge-send<ret>'
+  map global normal = ': python-bridge-send<ret>R'
   # run some python code initially
   python-bridge-send %{
 from math import *
@@ -28,7 +28,8 @@ or
 2. run `:python-bridge-send expr` where `expr` can be any python code.
 
 This will automatically start the interpreter if it is not running.
-Then it will execute the code using python and return the output in place of the selection or using an info box for option 1 and 2 respectively
+Then it will execute the code using python and return the output in the `"` register.
+This can then be used with <kbd>R</kbd> or <kbd>p</kbd> or some other command that uses the register.
 
 The interpreter will first try to run the code interactively line by line, if that fails, the whole code will be executed at once.
 
