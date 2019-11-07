@@ -10,22 +10,22 @@ while True:
         kakoune_python_bridge_lines = kakoune_python_bridge_c.splitlines()
         try:
             kakoune_python_bridge_sys.stdout = open(kakoune_python_bridge_output, 'w')
-            kakoune_python_bridge_failure = False
-            for kakoune_python_bridge_line in kakoune_python_bridge_lines:
+            if len(kakoune_python_bridge_lines) == 1 or \
+                    (len(kakoune_python_bridge_lines) == 2 and kakoune_python_bridge_lines[1] == ''):
+                kakoune_python_bridge_failure = False
                 try:
-                    kakoun_python_bridge_output = eval(kakoune_python_bridge_line)
+                    kakoun_python_bridge_output = eval(kakoune_python_bridge_lines[0])
                     if kakoun_python_bridge_output is not None:
                         print(kakoun_python_bridge_output)
-                except Exception:
-                    exec(kakoune_python_bridge_line)
-        except Exception:
-            try:
+                except SyntaxError:
+                    exec(kakoune_python_bridge_c)
+            else:
                 exec(kakoune_python_bridge_c)
-            except Exception as e:
-                e.__cause__ = None
-                kakoune_python_bridge_sys.stderr = kakoune_python_bridge_sys.stdout
-                kakoune_python_bridge_traceback.print_exc()
         except KeyboardInterrupt:
             pass
+        except Exception as e:
+            e.__cause__ = None
+            kakoune_python_bridge_sys.stderr = kakoune_python_bridge_sys.stdout
+            kakoune_python_bridge_traceback.print_exc()
         finally:
             kakoune_python_bridge_sys.stdout.close()
