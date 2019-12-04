@@ -48,10 +48,11 @@ or
 
 This will automatically start the repl if it is not running.
 
-The repl will be shut down using the `repl_send_exit_command` when the kakoune server is closed.
+The repl is scoped per buffer.
+The repl will be shut down using the `repl_send_exit_command` when the buffer is closed.
 
 # commands
 
 `repl-send-start` Start the repl  
-`repl-send-stop [exit_command]` Stop repl and remove FIFOs  
+`repl-send-stop` Stop repl and remove FIFOs  
 `repl-send [expression]` Send the current selections or argument to the repl  
