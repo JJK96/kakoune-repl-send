@@ -1,5 +1,8 @@
-This bridge runs a python shell in the background and can send selections through the shell.
-This way you can do calculations while keeping memory of previous variables, so this enables you to use variables in later calculations.
+This bridge runs a shell in the background and can send selections to the shell.
+The results are shown in a separate terminal.
+
+This way it differs from [kakoune-repl-bridge](https://github.com/jjk96/kakoune-repl-bridge) which also returns the output of the executed expression.
+The benefit of this plugin is that due to its simpler nature it works with more shells.
 
 # Install
 
@@ -8,45 +11,47 @@ Add this repository to your autoload dir: `~/.config/kak/autoload/`.
 Or via [plug.kak](https://github.com/andreyorst/plug.kak):
 
 ```
-plug 'JJK96/kakoune-python-bridge' %{
+plug 'JJK96/kakoune-repl-send' %{
   # Suggested mapping
-  map global normal = ': python-bridge-send<ret>R'
-  # run some python code initially
-  python-bridge-send %{
-from math import *
-  }
-  
+  map global normal <backspace> ': repl-send<ret>'
+}
+```
+
+# Configuration
+
+Before you are able to use the plugin you need to set the `repl_send_command` and `repl_send_exit_command` which are used to run the repl and exit it respectively
+
+## Examples
+
+```
+hook global WinSetOption filetype=python %{
+    set window repl_send_command "python -i"
+    set window repl_send_exit_command "exit()"
+}
+```   
+
+```
+hook global WinSetOption filetype=scheme %{
+    # stdbuf is used to disable buffering
+    set window repl_send_command "stdbuf -o0 chicken-csi"
+    set window repl_send_exit_command "(exit)"
 }
 ```
 
 # usage
 
-1. Select a piece of text that can be interpreted by python, then run `python-bridge-send`.
+1. Select a piece of text that can be interpreted by the interpreter you set for the buffer in the configuration step, then run `repl-send`.
 
 or
 
-2. run `:python-bridge-send expr` where `expr` can be any python code.
+2. run `:repl-send expr` where `expr` can be any code that can be interpreted by your interpreter.
 
-This will automatically start the interpreter if it is not running.
-Then it will execute the code using python and return the output in the `"` register.
-This can then be used with <kbd>R</kbd> or <kbd>p</kbd> or some other command that uses the register.
+This will automatically start the repl if it is not running.
 
-The interpreter will first try to run the code interactively line by line, if that fails, the whole code will be executed at once.
-
-If `python_bridge_fifo_enabled` is set to true the output will also be written to a second fifo, for example to keep track of previous outputs. 
-
-```
-set global option python_bridge_fifo_enabled true
-```
-
-The python interpreter will be shut down when the kakoune server is closed.
+The repl will be shut down using the `repl_send_exit_command` when the kakoune server is closed.
 
 # commands
 
-`python-bridge-start` Start the python bridge  
-`python-bridge-stop` Stop the python bridge  
-`python-bridge-send` Send the current selections through the python bridge  
-
-# options
-
-`python_bridge_fifo_enabled` Whether the output should be written to a second fifo (for keeping track of previous outputs)  
+`repl-send-start` Start the repl  
+`repl-send-stop` Stop the python bridge  
+`repl-send` Send the current selections or argument to the repl  
