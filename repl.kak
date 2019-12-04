@@ -19,14 +19,16 @@ repl-send-start %{
             echo "terminal cat $kak_opt_repl_send_out"
         fi
     }
+    hook global KakEnd .* "repl-send-stop %opt{repl_send_exit_command}"
     set-option global repl_send_running true
 }
 
-define-command -docstring 'Stop repl and remove FIFOs' \
-repl-send-stop %{
-    nop %sh{
+define-command -docstring 'repl-send-stop [exit_command]: Stop repl and remove FIFOs' \
+repl-send-stop -params 0..1 %{
+    eval %sh{
         if $kak_opt_repl_send_running; then
-            echo "$kak_opt_repl_send_exit_command" > $kak_opt_repl_send_in
+            exit_command=${1:-$kak_opt_repl_send_exit_command}
+            echo "$exit_command" > $kak_opt_repl_send_in
             rm $kak_opt_repl_send_in
             rm $kak_opt_repl_send_out
             rmdir -p $kak_opt_repl_send_folder
@@ -50,6 +52,3 @@ repl-send -params 0..1 %{
     }
 }
 
-hook global KakEnd .* %{
-    repl-send-stop
-}

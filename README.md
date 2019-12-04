@@ -53,5 +53,5 @@ The repl will be shut down using the `repl_send_exit_command` when the kakoune s
 # commands
 
 `repl-send-start` Start the repl  
-`repl-send-stop` Stop the python bridge  
-`repl-send` Send the current selections or argument to the repl  
+`repl-send-stop [exit_command]` Stop repl and remove FIFOs  
+`repl-send [expression]` Send the current selections or argument to the repl  
