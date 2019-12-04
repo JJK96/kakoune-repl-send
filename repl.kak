@@ -1,61 +1,54 @@
-# repl bridge1 for executing things interactively
+# send commands to repl for evaluation
 
-declare-option -hidden str repl_bridge1_folder "/tmp/kakoune_repl_bridge1/%val{session}"
-declare-option -hidden str repl_bridge1_in "%opt{repl_bridge1_folder}/in"
-declare-option -hidden str repl_bridge1_out "%opt{repl_bridge1_folder}/out"
-declare-option -hidden str repl_bridge1_fifo "%opt{repl_bridge1_folder}/fifo"
-declare-option -hidden str repl_bridge1_source %sh{echo "${kak_source%/*}"}
-declare-option -hidden str repl_bridge1_command "stdbuf -o0 chicken-csi"
-declare-option -hidden bool repl_bridge1_running false
+declare-option -hidden str repl_send_folder "/tmp/kakoune_repl_send/%val{session}"
+declare-option -hidden str repl_send_in "%opt{repl_send_folder}/in"
+declare-option -hidden str repl_send_out "%opt{repl_send_folder}/out"
+declare-option -hidden str repl_send_source %sh{echo "${kak_source%/*}"}
+declare-option -hidden str repl_send_command "stdbuf -o0 chicken-csi"
+declare-option -hidden bool repl_send_running false
 
 define-command -docstring 'Create FIFOs and start repl -i' \
-repl-bridge1-start %{
+repl-send-start %{
     evaluate-commands %sh{
-        if ! $kak_opt_repl_bridge1_running; then
-            mkdir -p $kak_opt_repl_bridge1_folder
-            mkfifo $kak_opt_repl_bridge1_in
-            mkfifo $kak_opt_repl_bridge1_out
-            ( tail -f $kak_opt_repl_bridge1_in | eval $kak_opt_repl_bridge1_command > $kak_opt_repl_bridge1_out ) >/dev/null 2>&1 </dev/null &
-            echo "terminal cat $kak_opt_repl_bridge1_out"
+        if ! $kak_opt_repl_send_running; then
+            mkdir -p $kak_opt_repl_send_folder
+            mkfifo $kak_opt_repl_send_in
+            mkfifo $kak_opt_repl_send_out
+            ( tail -f $kak_opt_repl_send_in | eval $kak_opt_repl_send_command > $kak_opt_repl_send_out 2>&1 ) >/dev/null 2>&1 </dev/null &
+            echo "terminal cat $kak_opt_repl_send_out"
         fi
     }
-    set-option global repl_bridge1_running true
+    set-option global repl_send_running true
 }
 
 define-command -docstring 'Stop repl -i and remove FIFOs' \
-repl-bridge1-stop %{
+repl-send-stop %{
     nop %sh{
-        if $kak_opt_repl_bridge1_running; then
-            echo "exit()" > $kak_opt_repl_bridge1_in
-            rm $kak_opt_repl_bridge1_in
-            rm $kak_opt_repl_bridge1_out
-            rmdir -p $kak_opt_repl_bridge1_folder
+        if $kak_opt_repl_send_running; then
+            echo "exit()" > $kak_opt_repl_send_in
+            rm $kak_opt_repl_send_in
+            rm $kak_opt_repl_send_out
+            rmdir -p $kak_opt_repl_send_folder
         fi
     }
-    set-option global repl_bridge1_running false
+    set-option global repl_send_running false
 }
 
-define-command -docstring 'Evaluate selections or argument using repl-bridge1 return result in " register' \
-repl-bridge1-send -params 0..1 %{
-    repl-bridge1-start
+define-command -docstring 'Evaluate selections or argument using repl-send return result in " register' \
+repl-send -params 0..1 %{
+    repl-send-start
     evaluate-commands %sh{
         if [ $# -eq 0 ]; then
             eval set -- "$kak_quoted_selections"
         fi
         out=""
         while [ $# -gt 0 ]; do
-            echo "$1" > $kak_opt_repl_bridge1_in &
+            echo "$1" > $kak_opt_repl_send_in &
             shift
         done
     }
 }
 
-define-command repl-bridge1 -params 1.. -shell-script-candidates %{
-    for cmd in start stop send;
-        do echo $cmd;
-    done
-} %{ evaluate-commands "repl-bridge1-%arg{1}" }
-
 hook global KakEnd .* %{
-    repl-bridge1-stop
+    repl-send-stop
 }
