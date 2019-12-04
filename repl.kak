@@ -11,13 +11,11 @@ declare-option -hidden bool repl_send_running false
 define-command -docstring 'Create FIFOs and start repl' \
 repl-send-start %{
     evaluate-commands %sh{
-        if ! $kak_opt_repl_send_running; then
-            mkdir -p $kak_opt_repl_send_folder
-            mkfifo $kak_opt_repl_send_in
-            mkfifo $kak_opt_repl_send_out
-            ( tail -f $kak_opt_repl_send_in | eval $kak_opt_repl_send_command > $kak_opt_repl_send_out 2>&1 ) >/dev/null 2>&1 </dev/null &
-            echo "terminal cat $kak_opt_repl_send_out"
-        fi
+        mkdir -p $kak_opt_repl_send_folder
+        mkfifo $kak_opt_repl_send_in
+        mkfifo $kak_opt_repl_send_out
+        ( tail -f $kak_opt_repl_send_in | eval $kak_opt_repl_send_command > $kak_opt_repl_send_out 2>&1 ) >/dev/null 2>&1 </dev/null &
+        echo "terminal cat $kak_opt_repl_send_out"
     }
     hook global KakEnd .* "repl-send-stop %opt{repl_send_exit_command}"
     set-option global repl_send_running true
@@ -25,7 +23,7 @@ repl-send-start %{
 
 define-command -docstring 'repl-send-stop [exit_command]: Stop repl and remove FIFOs' \
 repl-send-stop -params 0..1 %{
-    eval %sh{
+    nop %sh{
         if $kak_opt_repl_send_running; then
             exit_command=${1:-$kak_opt_repl_send_exit_command}
             echo "$exit_command" > $kak_opt_repl_send_in
@@ -39,7 +37,11 @@ repl-send-stop -params 0..1 %{
 
 define-command -docstring 'Send selections or argument using repl-send' \
 repl-send -params 0..1 %{
-    repl-send-start
+    evaluate-commands %sh{
+        if ! $kak_opt_repl_send_running; then
+            echo repl-send-start
+        fi
+    }
     evaluate-commands %sh{
         if [ $# -eq 0 ]; then
             eval set -- "$kak_quoted_selections"
